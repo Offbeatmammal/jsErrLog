@@ -26,6 +26,8 @@ report handling:
         // Optionally add additional debug information to the jsErrLog.info
         // message field
         //jsErrLog.info = "Populated the Info Message to pass to logger"
+        // Optionally specify URL to which the logging should be done
+        //jsErrLog.url = "http://www.myservice.com/logger.js";
     </script>
 
 The options are:
@@ -35,6 +37,10 @@ The options are:
 * **jsErrLog.info**: A custom string bundled with the HTTP GET request.
   Can be used to add additional information, such as a customer number,
   extra state or similar.
+* **jsErrLog.url**: The absolute URL to which GET requests will be made.
+  If not specified, it will default to
+
+    http://jserrlog.appspot.com/logger.js
 
 Which web browsers does this script support?
 --------------------------------------------
@@ -51,6 +57,10 @@ Un-supported browsers at this time
 Additional information
 ----------------------
 Original blog posts are [available here](http://post.offbeatmammal.com/tag/jserrlog)
+
+If your browser is not in the list above, please consider opening up the
+jsErrLog demo page (_src/demo/index.html_) to help us verify whether the
+script works in your browser or not.
 
 Contribute
 ----------
