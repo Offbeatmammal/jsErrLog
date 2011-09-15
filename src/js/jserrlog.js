@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js   			version 1.1
+//  jsErrLog.js         version 1.1
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
@@ -21,7 +21,7 @@ jsErrLog.err_i = 0;
 // default the additional info message to blank
 jsErrLog.info = "";
 
-// add the hook to the onError event	
+// add the hook to the onError event
 // - first store any existing error handler for the page
 jsErrLog.fnPreviousOnErrorHandler = window.onerror; 
 // - attach our error handler
