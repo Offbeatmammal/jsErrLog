@@ -1,0 +1,47 @@
+application: jserrlog
+version: 1
+runtime: python
+api_version: 1
+
+derived_file_type:
+- python_precompiled
+
+handlers:
+- url: /favicon\.ico
+  static_files: static/favicon.ico
+  upload: static/favicon.ico
+  mime_type: image/x-icon
+
+- url: /robots.txt
+  static_files: static/robots.txt
+  upload: static/robots.txt
+  
+- url: /jserrlog(.*)\.js
+  static_files: static/jserrlog\1.js
+  upload: static/jserrlog(.*).js
+
+- url: /logger\.js
+  script: logger.py
+  
+- url: /report\.html 
+  script: report.py
+
+- url: /rpt\.html
+  static_files: static/rpt.html
+  upload: static/rpt.html  
+
+- url: /report\.xml 
+  script: xml.py
+  
+- url: /cleaner\.html 
+  script: cleaner.py
+
+- url: /_ah/xmpp/message/chat/
+  script: xmpp.py  
+  
+- url: /.*
+  static_files: static/index.html
+  upload: static/index.html 
+
+inbound_services:
+- xmpp_message
