@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /jserrlog.js
+Disallow: /jserrlog-min.js
+Disallow: /report.html
+Disallow: /report.xml
