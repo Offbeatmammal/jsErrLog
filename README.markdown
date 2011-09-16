@@ -41,12 +41,12 @@ Which web browsers does this script support?
 * IE 6.0 and above
 * Firefox 4 and above
 * Chrome 10 and above (including ChromeOS)
-* WebKit nightlies (thought this [error needs resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
+* Safari 5.1 and above / WebKit nightlies (thought this [error needs resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
 
 Un-supported browsers at this time
 ----------------------------------
-* Safari (currently the fix from the WebKit nightlies have not been integrated)
 * Opera
+* Android
 
 Additional information
 ----------------------
