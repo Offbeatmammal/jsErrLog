@@ -4,11 +4,11 @@ Readme for jsErrLog
 What is this?
 -------------
 jsErrLog is a simple JavaScript script that catches your in-browser
-JavaScript errors and posts them to a
-[jserrlog.appspot.com][jsErrLogService]. This enables you to always be on
+JavaScript errors and posts them to the
+[jsErrLog Service](jserrlog.appspot.com). This enables you to always be on
 top of your JavaScript errors.
 
-[jsErrLogService]: http://jserrlog.appspot.com
+jsErrLog Service: http://jserrlog.appspot.com
 
 How to use
 ----------
@@ -18,7 +18,7 @@ Insert
 
 directly after your browsers <head> tag. You may optionally, directly
 after tha script tag add additional parameters to the error
-reporthandling:
+report handling:
 
     <script type="text/javascript">
         // Configure site parameters
@@ -38,10 +38,21 @@ The options are:
 
 Which web browsers does this script support?
 --------------------------------------------
-***stub***
+* IE 6.0 and above
+* Firefox 4 and above
+* Chrome 10 and above (including ChromeOS)
+* WebKit nightlies (thought this [error needs resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
+
+Un-supported browsers at this time
+----------------------------------
+* Safari (currently the fix from the WebKit nightlies have not been integrated)
+* Opera
+
+Additional information
+----------------------
+Original blog posts are [available here](http://post.offbeatmammal.com/tag/jserrlog)
 
 Contribute
 ----------
 This project can be forked on Github. Please issue pull requests from
 feature branches.
-
