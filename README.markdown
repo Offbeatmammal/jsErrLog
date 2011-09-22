@@ -106,18 +106,19 @@ For every client side (in-browser) JavaScript error, an HTTP GET request is
 is being made to the URL you specified. Every request contains the following
 parameters:
 
-* **i**: A unique identifier that identifies the a temporary
-  <code><script /></code> tag added to your <code><head> … </head></code>. This
-  identifier is used in the response back to the client. See more on this
-  below.
-* **sn**: The <code>document.URL</code> at which the error occured.
-* **fl**: The JavaScript file in which the error occurred.
-* **ln**: The line number in which the **fl** on which the error occurred.
-* **err**: A string describing the error.
-* **ui**: A (most certainly) unique string for your error message. It is being
-  generated according to [RFC 4112, section 4.4][RFC4112].
-* **info**: The optionally specified <code>jsErrLog.info</code> string set when
-  loading the page.
+* <code>i</code>: A unique identifier that identifies the a temporary
+  <code>&lt;script /&gt;</code> tag added to your
+  <code>&lt;head&gt; … &lt;/head&gt;</code>. This identifier is used in the
+  response back to the client. See more on this below.
+* <code>sn</code>: The <code>document.URL</code> at which the error occured.
+* <code>fl</code>: The JavaScript file in which the error occurred.
+* <code>ln</code>: The line number in <code>fl</code> on which the error
+  occurred.
+* <code>err</code>: A string describing the error.
+* <code>ui</code>: A (most certainly) unique string for your error message.
+  It is being generated according to [RFC 4112, section 4.4][RFC4112].
+* <code>info</code>: The optionally specified <code>jsErrLog.info</code> string
+  set when loading the page.
   
 [RFC4112]: http://www.ietf.org/rfc/rfc4122.txt
 
