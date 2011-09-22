@@ -1,4 +1,4 @@
-jsErrLog.removeScript(0); // jsErrRpt
+jsErrLog.removeScript(jsErrLog.err_i); // jsErrRpt
 
 function changeClass(element, newClass) {
   // borrowed from http://www.webdeveloper.com/forum/showthread.php?t=134282
