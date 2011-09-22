@@ -17,7 +17,7 @@ Insert
     <script type="text/javascript" src="jserrlog.js"></script>
 
 directly after your browsers <head> tag. You may optionally, directly
-after tha script tag add additional parameters to the error
+after the script tag add additional parameters to the error
 report handling:
 
     <script type="text/javascript">
@@ -46,7 +46,7 @@ The options are:
 Which web browsers does this script support?
 --------------------------------------------
 * IE 6.0 and above
-* Firefox 4 and above
+* Firefox 3.6.22 and above
 * Chrome 10 and above (including ChromeOS)
 * Safari 5.1 and above / WebKit nightlies (thought this [error needs resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
 
@@ -81,7 +81,7 @@ server that receives all the errors on your site:
  * Adding the JavaScript to some ticketing system.
 * You are on an Intranet that blocks communication out to the WWW.
 
-To role your own jsErrLog service there are two things you need to do:
+To roll your own jsErrLog service there are two things you need to do:
 
 1. Override the default URL that the jsErrLog browser script should use.
 2. Implement your server side engine to handle the requests coming in from
@@ -137,12 +137,12 @@ language specific way of extracting the value of the GET parameter
 
 You may also add additional JavaScript in your response if you want to. You
 could for example show a simple <code>alert(…)</code> box telling the user that
-the error has been logged and that you are looking into it. However, do not
+the error has been logged and that you are looking into it. However, do note
 that the alert box might pop up multiple times being both annoying and/or
 making the browser unusable if stuck in a bad loop. Another option would be to
 have a 'soft popup' show up in the client's web interface.
 
-Also, note that not JavaScript errors will always be errors that the user will
+Also, note that not all JavaScript errors will always be errors that the user will
 notice. Maybe he/she will never click on the button that would trigger the
 broken callback function etcetera.
 
