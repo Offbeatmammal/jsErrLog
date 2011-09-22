@@ -20,6 +20,11 @@ jsErrLog.error_msg = "";
 jsErrLog.err_i = 0;
 // default the additional info message to blank
 jsErrLog.info = "";
+// default the URL to the appspot service
+jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
+
+// used internally for testing to know if test succeeded or not
+jsErrLog._had_errors = false;
 
 // add the hook to the onError event
 // - first store any existing error handler for the page
@@ -61,6 +66,7 @@ jsErrLog.removeScript = function(index) {
 };
 
 jsErrLog.ErrorHandler = function(source, error) {
+  jsErrLog._had_errors = true;
 	alert("jsErrLog encountered an unexpected error.\n\nSource: " + source + "\nDescription: " + error.description); 
 };
 
@@ -75,16 +81,18 @@ jsErrLog.guid = function() { // http://www.ietf.org/rfc/rfc4122.txt section 4.4
 jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 	// Is we are debugging on the page then display the error details
 	if(jsErrLog.debugMode) {
-	jsErrLog.error_msg = "Error found in page: " + file_loc +
-                          "\nat line number:" + line_no +
-                           "\nError Message:" + msg;
-	if (jsErrLog.info != "") {
-		jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
-	}
+		jsErrLog.error_msg = "Error found in page: " + file_loc +
+		                     "\nat line number:" + line_no +
+		                     "\nError Message:" + msg;
+		if (jsErrLog.info != "") {
+			jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
+		}
 		alert("jsErrLog caught an error\n--------------\n" + jsErrLog.error_msg);
 	} else {
+		jsErrLog.err_i = jsErrLog.err_i + 1;
+
 		// format the data for the request
-		var src = "http://jserrlog.appspot.com/logger.js?i=" + jsErrLog.err_i;
+		var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
 		src += "&sn=" + escape(document.URL.trim());
 		src += "&fl=" + file_loc;
 		src += "&ln=" + line_no;
@@ -95,7 +103,6 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 		}
 		// and pass the error details to the Async logging sender		
 		jsErrLog.appendScript(jsErrLog.err_i, src);
-		jsErrLog.err_i = jsErrLog.err_i + 1;
 	}
 	return true;
 }
