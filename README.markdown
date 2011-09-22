@@ -96,7 +96,7 @@ to the URL of your error logger. A full example here below:
     <script type="text/javascript">
         jsErrLog.url = "http://www.myownservice.com/logger.js";
     </script>
-    
+
 note that it is recommended for the URL to end with '.js'. Also note that it
 must support HTTP GET requests.
 
@@ -119,7 +119,7 @@ parameters:
   It is being generated according to [RFC 4112, section 4.4][RFC4112].
 * <code>info</code>: The optionally specified <code>jsErrLog.info</code> string
   set when loading the page.
-  
+
 [RFC4112]: http://www.ietf.org/rfc/rfc4122.txt
 
 The response given by your service ***must be valid JavaScript***. This is
