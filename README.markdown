@@ -150,5 +150,6 @@ broken callback function etcetera.
 
 Contribute
 ----------
-This project can be forked on Github. Please issue pull requests from
-feature branches.
+This project can be forked from
+[Github](https://github.com/Offbeatmammal/jsErrLog). Please issue pull
+requests from feature branches.
