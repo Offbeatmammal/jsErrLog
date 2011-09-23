@@ -48,7 +48,8 @@ Which web browsers does this script support?
 * IE 6.0 and above
 * Firefox 3.6.22 and above
 * Chrome 10 and above (including ChromeOS)
-* Safari 5.1 and above / WebKit nightlies (thought this [error needs resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
+* Safari 5.1 and above / WebKit nightlies (thought this [error needs
+  resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
 
 Un-supported browsers at this time
 ----------------------------------
@@ -57,7 +58,8 @@ Un-supported browsers at this time
 
 Additional information
 ----------------------
-Original blog posts are [available here](http://post.offbeatmammal.com/tag/jserrlog)
+Original blog posts are [available
+here](http://post.offbeatmammal.com/tag/jserrlog).
 
 If your browser is not in the list above, please consider opening up the
 jsErrLog demo page (_src/demo/index.html_) to help us verify whether the
@@ -142,11 +144,12 @@ that the alert box might pop up multiple times being both annoying and/or
 making the browser unusable if stuck in a bad loop. Another option would be to
 have a 'soft popup' show up in the client's web interface.
 
-Also, note that not all JavaScript errors will always be errors that the user will
-notice. Maybe he/she will never click on the button that would trigger the
+Also, note that not all JavaScript errors will always be errors that the user
+will notice. Maybe he/she will never click on the button that would trigger the
 broken callback function etcetera.
 
 Contribute
 ----------
-This project can be forked on Github. Please issue pull requests from
-feature branches.
+This project can be forked from
+[Github](https://github.com/Offbeatmammal/jsErrLog). Please issue pull
+requests from feature branches.
