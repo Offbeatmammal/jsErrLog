@@ -59,7 +59,7 @@ Un-supported browsers at this time
 Additional information
 ----------------------
 Original blog posts are [available
-here](http://post.offbeatmammal.com/tag/jserrlog)
+here](http://post.offbeatmammal.com/tag/jserrlog).
 
 If your browser is not in the list above, please consider opening up the
 jsErrLog demo page (_src/demo/index.html_) to help us verify whether the
