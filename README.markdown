@@ -8,20 +8,21 @@ JavaScript errors and posts them to the
 [jsErrLog Service](jserrlog.appspot.com). This enables you to always be on
 top of your JavaScript errors.
 
-jsErrLog Service: http://jserrlog.appspot.com
+jsErrLog Service Homepage and demo site: http://jserrlog.appspot.com
 
 How to use
 ----------
 Insert
 
-    <script type="text/javascript" src="jserrlog.js"></script>
+    <code><script type="text/javascript" src="jserrlog.js"></script></code>
 
-directly after your browsers <head> tag. You may optionally, directly
-after the script tag add additional parameters to the error
+directly after your browsers <code>&lt;head></code> tag. You may optionally, directly
+after the script tag, add additional parameters to the error
 report handling:
 
-    <script type="text/javascript">
+    <code><script type="text/javascript">
         // Configure site parameters
+		// Optional to allow the error message to also be presented to the user
         //jsErrLog.debugMode = true;
         // Optionally add additional debug information to the jsErrLog.info
         // message field
@@ -32,7 +33,7 @@ report handling:
 		// either on the fileloc or the server name. Simply list them in the array
 		// and script will check for them (case insensitive)
 		//jsErrLog.qsIgnore = ["userid","password"];
-    </script>
+    </script></code>
 
 The options are:
 
