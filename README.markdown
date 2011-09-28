@@ -14,13 +14,13 @@ How to use
 ----------
 Insert
 
-    <code><script type="text/javascript" src="jserrlog.js"></script></code>
+    <script type="text/javascript" src="jserrlog.js"></script>
 
 directly after your browsers <code>&lt;head></code> tag. You may optionally, directly
 after the script tag, add additional parameters to the error
 report handling:
 
-    <code><script type="text/javascript">
+    <script type="text/javascript">
         // Configure site parameters
 		// Optional to allow the error message to also be presented to the user
         //jsErrLog.debugMode = true;
@@ -33,7 +33,7 @@ report handling:
 		// either on the fileloc or the server name. Simply list them in the array
 		// and script will check for them (case insensitive)
 		//jsErrLog.qsIgnore = ["userid","password"];
-    </script></code>
+    </script>
 
 The options are:
 
