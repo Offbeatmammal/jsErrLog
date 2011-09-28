@@ -28,6 +28,10 @@ report handling:
         //jsErrLog.info = "Populated the Info Message to pass to logger"
         // Optionally specify URL to which the logging should be done
         //jsErrLog.url = "http://www.myservice.com/logger.js";
+		// Optionally specify certain querystring parameters never to pass to the logging service
+		// either on the fileloc or the server name. Simply list them in the array
+		// and script will check for them (case insensitive)
+		//jsErrLog.qsIgnore = ["userid","password"];
     </script>
 
 The options are:
@@ -39,9 +43,8 @@ The options are:
   extra state or similar.
 * **jsErrLog.url**: The absolute URL to which GET requests will be made. See
   [below](#yourownservice) for more information on how to do this. If not
-  specified, the jsErrLog.url will default to
-
-    http://jserrlog.appspot.com/logger.js
+  specified, the jsErrLog.url will default to http://jserrlog.appspot.com/logger.js
+* **jsErrLog.qsIgnore**: populates an array of querystring parameters to be stripped before reporting
 
 Which web browsers does this script support?
 --------------------------------------------
@@ -58,8 +61,7 @@ Un-supported browsers at this time
 
 Additional information
 ----------------------
-Original blog posts are [available
-here](http://post.offbeatmammal.com/tag/jserrlog).
+Original blog posts are [available here](http://post.offbeatmammal.com/tag/jserrlog).
 
 If your browser is not in the list above, please consider opening up the
 jsErrLog demo page (_src/demo/index.html_) to help us verify whether the
@@ -123,6 +125,8 @@ parameters:
   set when loading the page.
 
 [RFC4112]: http://www.ietf.org/rfc/rfc4122.txt
+
+You can verify that the format of the parameters using a tool such as [Fiddler](http://fiddlertool.com) to watch the messages as they are sent over http.
 
 The response given by your service ***must be valid JavaScript***. This is
 *very* important, as it otherwise might lead to a flood of requests coming in
