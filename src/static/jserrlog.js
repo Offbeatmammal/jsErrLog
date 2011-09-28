@@ -1,10 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js         version 1.1
+//  jsErrLog.js         version 1.3
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
 //
+//  v1.3: add support for jsErrLog.qsignore parameter
+//  v1.2: add support for jsErrLog.url parameter
 //  v1.1: add support for jsErrLog.info parameter
 //  v1.0: Original
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,6 +24,8 @@ jsErrLog.err_i = 0;
 jsErrLog.info = "";
 // default the URL to the appspot service
 jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
+// default the qsIgnore to nothing (ie pass everything on the querystring)
+jsErrLog.qsIgnore = new Array();
 
 // used internally for testing to know if test succeeded or not
 jsErrLog._had_errors = false;
@@ -77,6 +81,42 @@ jsErrLog.guid = function() { // http://www.ietf.org/rfc/rfc4122.txt section 4.4
 		}).toUpperCase();
 }
 
+// Needed to break the URL up if we want to ignore parameters
+function parseURL(url)
+{
+    // save the unmodified url to "href" property so
+    // the returned object matches the built-in location object
+    var locn = { 'href' : url };
+
+    // split the URL components
+    var urlParts = url.replace('//', '/').split('/');
+
+    //store the protocol and host
+    locn.protocol = urlParts[0];
+    locn.host = urlParts[1];
+
+    //extract port number from the host
+    urlParts[1] = urlParts[1].split(':');
+    locn.hostname = urlParts[1][0];
+    locn.port = urlParts[1].length > 1 ? urlParts[1][1] : '';
+
+    //splice and join the remainder to get the pathname
+    urlParts.splice(0, 2);
+    locn.pathname = '/' + urlParts.join('/');
+
+    //extract hash
+    locn.pathname = locn.pathname.split('#');
+    locn.hash = locn.pathname.length > 1 ? '#' + locn.pathname[1] : '';
+    locn.pathname = locn.pathname[0];
+
+    // extract search query
+    locn.pathname = locn.pathname.split('?');
+    locn.search = locn.pathname.length > 1 ? '?' + locn.pathname[1] : '';
+    locn.pathname = locn.pathname[0];
+
+    return locn;
+}
+
 // Respond to an error being raised in the javascript
 jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 	// Is we are debugging on the page then display the error details
@@ -91,15 +131,75 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 	} else {
 		jsErrLog.err_i = jsErrLog.err_i + 1;
 
+		// if there are parameters we need to ignore on the querystring strip them off
+		var sn = document.URL;
+		if (jsErrLog.qsIgnore.length > 0) {
+			var objURL = new Object();
+ 			// make sure the qsIgnore array is lower case
+			for (var i in jsErrLog.qsIgnore) {
+				jsErrLog.qsIgnore[i] = jsErrLog.qsIgnore[i].toLowerCase();
+			}
+ 
+			// Use the String::replace method to iterate over each
+			// name-value pair in the query string.
+			window.location.search.replace(
+			new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+			// For each matched query string pair, add that
+			// pair to the URL struct using the pre-equals
+			// value as the key.
+				function( $0, $1, $2, $3 ){
+					// Only if the key is NOT in the ignore list should we pick it up
+					if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
+						objURL[ $1 ] = $3;
+					}
+				}
+			);
+			var newSearch = "";
+			for (var strKey in objURL){
+				newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
+			};
+
+			// Rebuild the new "sn" parameter containing the sanitized version of the querystring
+			sn = window.location.protocol + window.location.host + window.location.pathname;
+			sn += window.location.search != ("") ? newSearch : "";
+			sn += window.location.hash != ("") ? window.location.hash : "";
+			
+			// now repeat the process for the fileloc
+			var fl = parseURL(file_loc);
+			objURL = new Object();
+			fl.search.replace(
+			new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+			// For each matched query string pair, add that
+			// pair to the URL struct using the pre-equals
+			// value as the key.
+				function( $0, $1, $2, $3 ){
+					// Only if the key is NOT in the ignore list should we pick it up
+					if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
+						objURL[ $1 ] = $3;
+					}
+				}
+			);
+			var newFL = "";
+			for (var strKey in objURL){
+				newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
+			};
+			if (newFL != "") {
+				file_loc = fl.protocol + fl.host + fl.pathname;
+				file_loc += fl.search != ("") ? newFL : "";
+				file_loc += fl.hash != ("") ? fl.hash : "";
+ 
+			}
+		}
+		
 		// format the data for the request
 		var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
-		src += "&sn=" + escape(document.URL.trim());
+		src += "&sn=" + escape(sn);
 		src += "&fl=" + file_loc;
 		src += "&ln=" + line_no;
-		src += "&err=" + msg.trim().substr(0, 1024);
+		src += "&err=" + msg.substr(0, 1024);
 		src += "&ui=" + jsErrLog.guid();
 		if (jsErrLog.info != "") {
-			src += "&info=" + escape(jsErrLog.info.trim().substr(0, 512));
+			src += "&info=" + escape(jsErrLog.info.substr(0, 512));
 		}
 		// and pass the error details to the Async logging sender		
 		jsErrLog.appendScript(jsErrLog.err_i, src);
