@@ -54,7 +54,7 @@ Which web browsers does this script support?
 * Chrome 10 and above (including ChromeOS)
 * Safari 5.1 and above / WebKit nightlies (thought this [error needs
   resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
-* Opera v12 with Presto/2.10.229 JS engine and above
+* Opera v11.60 (and Opera.Next v12) with Presto/2.10.229 JS engine and above
 
 Un-supported browsers at this time
 ----------------------------------
