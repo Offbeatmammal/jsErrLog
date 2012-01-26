@@ -2,8 +2,8 @@ jsErrLog.removeScript(jsErrLog.err_i); // jsErrRpt
 
 function changeClass(element, newClass) {
   // borrowed from http://www.webdeveloper.com/forum/showthread.php?t=134282
-	element.setAttribute("class", newClass); //For Most Browsers
-	element.setAttribute("className", newClass); //For IE; harmless to other browsers.
+  element.setAttribute("class", newClass); //For Most Browsers
+  element.setAttribute("className", newClass); //For IE; harmless to other browsers.
 }
 
 var element = document.getElementById('testbox');
