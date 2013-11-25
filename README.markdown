@@ -5,7 +5,7 @@ What is this?
 -------------
 jsErrLog is a simple JavaScript script that catches your in-browser
 JavaScript errors and posts them to the
-[jsErrLog Service](jserrlog.appspot.com). This enables you to always be on
+[jsErrLog Service](http://jserrlog.appspot.com). This enables you to always be on
 top of your JavaScript errors.
 
 jsErrLog Service Homepage and demo site: http://jserrlog.appspot.com
