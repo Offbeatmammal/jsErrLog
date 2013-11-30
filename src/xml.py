@@ -57,7 +57,7 @@ class MainHandler(webapp.RequestHandler):
 			body = '<rss version="2.0">\n'
 			body += '<channel>\n'
 			body += ('<title>jsErrLog Feed for %s</title>\n' % url)
-			body += '<link>%s</link>\n'
+			body += ('<link>%s</link>\n' % url)
 			body += ('<description>Javascript errors reported for %s</description>' % url)
 			body += '<language>en-us</language>'
 			body += '<ttl>180</ttl>'
