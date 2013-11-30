@@ -9,6 +9,7 @@ JavaScript errors and posts them to the
 top of your JavaScript errors.
 
 jsErrLog Service Homepage and demo site: http://jserrlog.appspot.com
+(note: the demo site may be out of sync with the code here, so mix'n'match at your own risk)
 
 How to use
 ----------
