@@ -34,6 +34,8 @@ report handling:
 		// either on the fileloc or the server name. Simply list them in the array
 		// and script will check for them (case insensitive)
 		//jsErrLog.qsIgnore = ["userid","password"];
+		//Limit number of errors that will be sent for a page (default is 10, -1 allows infinite)
+		//jsErrLog.maxRep = 10;
     </script>
 
 The options are:
@@ -47,6 +49,7 @@ The options are:
   [below](#yourownservice) for more information on how to do this. If not
   specified, the jsErrLog.url will default to http://jserrlog.appspot.com/logger.js
 * **jsErrLog.qsIgnore**: populates an array of querystring parameters to be stripped before reporting
+* **jsErrLog.maxRep**: Max number of errors that will be reported for a page
 
 Which web browsers does this script support?
 --------------------------------------------

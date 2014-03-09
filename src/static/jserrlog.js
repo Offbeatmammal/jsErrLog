@@ -1,46 +1,50 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js         version 1.3
+//  jsErrLog.js         version 1.4
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
 //
+//  v1.4: limit initialization to one instance, escape FL and ERR parameter, limit reports sent
 //  v1.3: add support for jsErrLog.qsignore parameter
 //  v1.2: add support for jsErrLog.url parameter
 //  v1.1: add support for jsErrLog.info parameter
 //  v1.0: Original
 ///////////////////////////////////////////////////////////////////////////////
 
-if (!window.jsErrLog)
+if (!window.jsErrLog) {
 	window.jsErrLog = { };
 
-// default to debugging off
-jsErrLog.debugMode = false;
-// default error message to blank
-jsErrLog.error_msg = "";
-// default the index for the message to 0 in case there is more than one
-jsErrLog.err_i = 0;
-// default the additional info message to blank
-jsErrLog.info = "";
-// default the URL to the appspot service
-jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
-// default the qsIgnore to nothing (ie pass everything on the querystring)
-jsErrLog.qsIgnore = new Array();
+	// default to debugging off
+	jsErrLog.debugMode = false;
+	// default error message to blank
+	jsErrLog.error_msg = "";
+	// default the index for the message to 0 in case there is more than one
+	jsErrLog.err_i = 0;
+	// default the additional info message to blank
+	jsErrLog.info = "";
+	// default the URL to the appspot service
+	jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
+	// default the qsIgnore to nothing (ie pass everything on the querystring)
+	jsErrLog.qsIgnore = new Array();
+	// max number of reports sent from a page (defaults to 10, -1 allows infinite)
+	jsErrLog.maxRep = 10;
 
-// used internally for testing to know if test succeeded or not
-jsErrLog._had_errors = false;
+	// used internally for testing to know if test succeeded or not
+	jsErrLog._had_errors = false;
 
-// add the hook to the onError event
-// - first store any existing error handler for the page
-jsErrLog.fnPreviousOnErrorHandler = window.onerror; 
-// - attach our error handler
-window.onerror=function(msg, file_loc, line_no){
-	jsErrLog.ErrorTrap(msg, file_loc, line_no);
-	if(typeof(jsErrLog.fnPreviousOnErrorHandler) == "function") {
-		// process any existing onerror handler 
-		jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no);
+	// add the hook to the onError event
+	// - first store any existing error handler for the page
+	jsErrLog.fnPreviousOnErrorHandler = window.onerror; 
+	// - attach our error handler
+	window.onerror = function(msg, file_loc, line_no){
+		jsErrLog.ErrorTrap(msg, file_loc, line_no);
+		if(typeof(jsErrLog.fnPreviousOnErrorHandler) == "function") {
+			// process any existing onerror handler 
+			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no);
+		}
+		return true;
 	}
-	return true;
 }
 
 jsErrLog.appendScript = function(index, src) {
@@ -194,15 +198,21 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 		// format the data for the request
 		var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
 		src += "&sn=" + escape(sn);
-		src += "&fl=" + file_loc;
+		src += "&fl=" + escape(file_loc);
 		src += "&ln=" + line_no;
-		src += "&err=" + msg.substr(0, 1024);
+		src += "&err=" + escape(msg.substr(0, 1024));
 		src += "&ui=" + jsErrLog.guid();
 		if (jsErrLog.info != "") {
 			src += "&info=" + escape(jsErrLog.info.substr(0, 512));
 		}
 		// and pass the error details to the Async logging sender		
-		jsErrLog.appendScript(jsErrLog.err_i, src);
+		// if the jsErrLog.maxRep hasn't tripped
+		if ((jsErrLog.maxRep > 0) || (jsErrLog.maxRep = -1)) {
+			if (jsErrLog.maxRep > 0) {
+				jsErrLog.maxRep -= 1
+			}
+			jsErrLog.appendScript(jsErrLog.err_i, src);
+		}
 	}
 	return true;
 }
