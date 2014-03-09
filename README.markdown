@@ -123,6 +123,8 @@ parameters:
 * <code>fl</code>: The JavaScript file in which the error occurred.
 * <code>ln</code>: The line number in <code>fl</code> on which the error
   occurred.
+* <code>cn</code>: The col number in <code>fl</code> on which the error
+  occurred.
 * <code>err</code>: A string describing the error.
 * <code>ui</code>: A (most certainly) unique string for your error message.
   It is being generated according to [RFC 4112, section 4.4][RFC4112].
