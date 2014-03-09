@@ -34,7 +34,9 @@ report handling:
 		// either on the fileloc or the server name. Simply list them in the array
 		// and script will check for them (case insensitive)
 		//jsErrLog.qsIgnore = ["userid","password"];
-		//Limit number of errors that will be sent for a page (default is 10, -1 allows infinite)
+		// If you want to ignore certain domains from reporting (eg Twitter API) add them to
+		//jsErrLog.domainIgnore = ["http://ignore.domain.com","https://do.not.track.net"]
+		// Limit number of errors that will be sent for a page (default is 10, -1 allows infinite)
 		//jsErrLog.maxRep = 10;
     </script>
 
