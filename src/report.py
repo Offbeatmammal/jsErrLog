@@ -42,7 +42,7 @@ class MainHandler(webapp.RequestHandler):
         for p in results:		
             #t = datetime.strptime(str(p.ts).split(".", 1)[0], "%Y-%m-%d %H:%M:%S")
             #t2 = p.ts.strftime("%m/%d/%Y %H:%M:%S")
-            body += ("<tr><td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s" % (p.ts.strftime("%m/%d/%Y %H:%M:%S"),p.serverPath,p.fileLoc, p.lineNo+"/"+pcolNo, p.errMsg, p.OSName+" "+p.OSVer, p.BrowserName+" " +p.BrowserVer, p.infoMsg))
+            body += ("<tr><td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s" % (p.ts.strftime("%m/%d/%Y %H:%M:%S"),p.serverPath,p.fileLoc, str(p.lineNo)+"/"+str(p.colNo), p.errMsg, p.OSName+" "+p.OSVer, p.BrowserName+" " +p.BrowserVer, p.infoMsg))
         body += ("</table>")
 
         template_values = {
