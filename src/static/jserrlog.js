@@ -1,10 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js         version 1.4.1
+//  jsErrLog.js         version 1.4.2
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
 //
+//  v1.4.2: domainIgnore adds prefix ignore on file location
 //  v1.4.1: added support for colNo in browsers that support it (IE10, Chrome30)
 //  v1.4.0: limit initialization to one instance, escape FL and ERR parameter, limit reports sent
 //  v1.3.0: add support for jsErrLog.qsignore parameter
@@ -28,6 +29,8 @@ if (!window.jsErrLog) {
 	jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
 	// default the qsIgnore to nothing (ie pass everything on the querystring)
 	jsErrLog.qsIgnore = new Array();
+	// default ignored domains to nothing
+    jsErrLog.domainIgnore = new Array();
 	// max number of reports sent from a page (defaults to 10, -1 allows infinite)
 	jsErrLog.maxRep = 10;
 
@@ -208,13 +211,30 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		if (jsErrLog.info != "") {
 			src += "&info=" + escape(jsErrLog.info.substr(0, 512));
 		}
-		// and pass the error details to the Async logging sender		
-		// if the jsErrLog.maxRep hasn't tripped
-		if ((jsErrLog.maxRep > 0) || (jsErrLog.maxRep = -1)) {
-			if (jsErrLog.maxRep > 0) {
-				jsErrLog.maxRep -= 1
+		
+		// check that the fl domain/prefix doesn't match anything in the domainIgnore array
+		ignore = false
+		ignoreFL = file_loc.toLowerCase()
+		for (var i in jsErrLog.domainIgnore) {
+			if (ignoreFL.substr(0,jsErrLog.domainIgnore[i].length) == jsErrLog.domainIgnore[i].toLowerCase()) {
+				ignore = true;
+				break;
 			}
-			jsErrLog.appendScript(jsErrLog.err_i, src);
+		}
+		
+		if (ignore) {
+			// the file_loc matched an item we want to ignore
+			console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list")
+		} else {
+
+			// and pass the error details to the Async logging sender		
+			// if the jsErrLog.maxRep hasn't tripped
+			if ((jsErrLog.maxRep > 0) || (jsErrLog.maxRep = -1)) {
+				if (jsErrLog.maxRep > 0) {
+					jsErrLog.maxRep -= 1
+				}
+				jsErrLog.appendScript(jsErrLog.err_i, src);
+			}
 		}
 	}
 	return true;

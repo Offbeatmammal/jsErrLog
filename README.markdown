@@ -49,6 +49,7 @@ The options are:
   [below](#yourownservice) for more information on how to do this. If not
   specified, the jsErrLog.url will default to http://jserrlog.appspot.com/logger.js
 * **jsErrLog.qsIgnore**: populates an array of querystring parameters to be stripped before reporting
+* **jsErrLog.domainIgnore**: populates an array of prefixes that will be ignored on file location before reporting, can be used to avoid reporting on ad server or 3rd party sites - for example jsErrLog.domainIgnore = ["http://api.twitter.com","http://api.maps.google.com"];
 * **jsErrLog.maxRep**: Max number of errors that will be reported for a page
 
 Which web browsers does this script support?
