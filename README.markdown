@@ -53,9 +53,9 @@ The options are:
 
 Which web browsers does this script support?
 --------------------------------------------
-* IE 6.0 and above
+* IE 6.0 and above. IE10+ supports colNo on error reports
 * Firefox 3.6.22 and above
-* Chrome 10 and above (including ChromeOS)
+* Chrome 10 and above (including ChromeOS and on Android). Chrome 30+ supports colNo on error reports
 * Safari 5.1 and above / WebKit nightlies (thought this [error needs
   resolving](https://bugs.webkit.org/show_bug.cgi?id=63506).)
 * Opera v11.60 (and Opera.Next v12) with Presto/2.10.229 JS engine and above

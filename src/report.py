@@ -11,6 +11,7 @@ class LogErr(db.Model):
         serverPath = db.StringProperty()
         fileLoc = db.StringProperty()
         lineNo = db.StringProperty()
+        colNo = db.StringProperty()
         errMsg = db.StringProperty()
         infoMsg = db.StringProperty()
         IP = db.StringProperty()
@@ -37,11 +38,11 @@ class MainHandler(webapp.RequestHandler):
         body = ("<p><a href='/index.html'>jsErrLog</a> Reporting: Requests for <b>" + url + "</b> <a href='rpt.html'>change</a><br>")
         body += ("Direct link to <a href=\"report.xml?sn=" + url + "\">XML version</a><br>")
         body += ("<table>")
-        body += ("<tr><td>Time<td>Path<td>Location<td>Line No<td>Err Msg<td>OS<td>Browser<td>Info Msg")
+        body += ("<tr><td>Time<td>Path<td>Location<td>Line/Col No<td>Err Msg<td>OS<td>Browser<td>Info Msg")
         for p in results:		
             #t = datetime.strptime(str(p.ts).split(".", 1)[0], "%Y-%m-%d %H:%M:%S")
             #t2 = p.ts.strftime("%m/%d/%Y %H:%M:%S")
-            body += ("<tr><td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s" % (p.ts.strftime("%m/%d/%Y %H:%M:%S"),p.serverPath,p.fileLoc, p.lineNo, p.errMsg, p.OSName+" "+p.OSVer, p.BrowserName+" " +p.BrowserVer, p.infoMsg))
+            body += ("<tr><td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s<td>%s" % (p.ts.strftime("%m/%d/%Y %H:%M:%S"),p.serverPath,p.fileLoc, p.lineNo+"/"+pcolNo, p.errMsg, p.OSName+" "+p.OSVer, p.BrowserName+" " +p.BrowserVer, p.infoMsg))
         body += ("</table>")
 
         template_values = {

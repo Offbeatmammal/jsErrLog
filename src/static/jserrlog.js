@@ -1,15 +1,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js         version 1.4
+//  jsErrLog.js         version 1.4.1
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
 //
-//  v1.4: limit initialization to one instance, escape FL and ERR parameter, limit reports sent
-//  v1.3: add support for jsErrLog.qsignore parameter
-//  v1.2: add support for jsErrLog.url parameter
-//  v1.1: add support for jsErrLog.info parameter
-//  v1.0: Original
+//  v1.4.1: added support for colNo in browsers that support it (IE10, Chrome30)
+//  v1.4.0: limit initialization to one instance, escape FL and ERR parameter, limit reports sent
+//  v1.3.0: add support for jsErrLog.qsignore parameter
+//  v1.2.0: add support for jsErrLog.url parameter
+//  v1.1.0: add support for jsErrLog.info parameter
+//  v1.0.0: Original
 ///////////////////////////////////////////////////////////////////////////////
 
 if (!window.jsErrLog) {
@@ -37,11 +38,11 @@ if (!window.jsErrLog) {
 	// - first store any existing error handler for the page
 	jsErrLog.fnPreviousOnErrorHandler = window.onerror; 
 	// - attach our error handler
-	window.onerror = function(msg, file_loc, line_no){
-		jsErrLog.ErrorTrap(msg, file_loc, line_no);
+	window.onerror = function(msg, file_loc, line_no, col_no){
+		jsErrLog.ErrorTrap(msg, file_loc, line_no, col_no);
 		if(typeof(jsErrLog.fnPreviousOnErrorHandler) == "function") {
 			// process any existing onerror handler 
-			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no);
+			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
 		}
 		return true;
 	}
@@ -122,7 +123,7 @@ function parseURL(url)
 }
 
 // Respond to an error being raised in the javascript
-jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
+jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 	// Is we are debugging on the page then display the error details
 	if(jsErrLog.debugMode) {
 		jsErrLog.error_msg = "Error found in page: " + file_loc +
@@ -200,6 +201,8 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no) {
 		src += "&sn=" + escape(sn);
 		src += "&fl=" + escape(file_loc);
 		src += "&ln=" + line_no;
+		src += "&cn="; 
+		src += (typeof col_no === "undefined") ? "" : col_no;
 		src += "&err=" + escape(msg.substr(0, 1024));
 		src += "&ui=" + jsErrLog.guid();
 		if (jsErrLog.info != "") {

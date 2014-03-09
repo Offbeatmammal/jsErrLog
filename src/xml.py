@@ -13,6 +13,7 @@ class LogErr(db.Model):
 		serverPath = db.StringProperty()
 		fileLoc = db.StringProperty()
 		lineNo = db.StringProperty()
+		colNo = db.StringProperty()
 		errMsg = db.StringProperty()
 		infoMsg = db.StringProperty()
 		IP = db.StringProperty()
@@ -71,7 +72,7 @@ class MainHandler(webapp.RequestHandler):
 				body += '<description>'
 				body += 'At ' + p.ts.strftime("%m/%d/%Y %H:%M:%S")
 				body += (". Exception in %s " % p.serverPath)
-				body += ("at line " + p.lineNo + " in " + p.fileLoc + "\n")
+				body += ("at line/col " + p.lineNo + "/" + p.colNo + " in " + p.fileLoc + "\n")
 				body += ("The error was: %s\n" % p.errMsg)
 				body += ("Client OS:" + p.OSName + " version=" + p.OSVer + "\n")
 				body += ("Browser:" + p.BrowserName + " version=" + p.BrowserVer + "\n")
@@ -90,7 +91,7 @@ class MainHandler(webapp.RequestHandler):
 			for p in results:		
 				body += ("<entry ts=\"%s\">\n" % (p.ts.strftime("%m/%d/%Y %H:%M:%S")))
 				body += ("<serverPath>%s</serverPath>\n" % p.serverPath)
-				body += ("<file lineNo=\"" + p.lineNo + "\">" + p.fileLoc + "</file>\n")
+				body += ("<file lineNo=\"" + p.lineNo + "\" colNo=\"" + p.colNo + "\">" + p.fileLoc + "</file>\n")
 				body += ("<error>%s</error>\n" % p.errMsg)
 				body += ("<OS name=\"" + p.OSName + "\" version=\"" + p.OSVer + "\"/>\n")
 				body += ("<Browser name=\"" + p.BrowserName + "\" version=\"" + p.BrowserVer + "\"/>\n")

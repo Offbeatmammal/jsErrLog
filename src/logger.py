@@ -13,6 +13,7 @@ class LogErr(db.Model):
         serverPath = db.StringProperty()
         fileLoc = db.StringProperty()
         lineNo = db.StringProperty()
+        colNo = db.StringProperty()
         errMsg = db.StringProperty()
         infoMsg = db.StringProperty()
         IP = db.StringProperty()
@@ -33,6 +34,7 @@ class MainHandler(webapp.RequestHandler):
     def get(self):
         QfileLoc = self.request.get("fl")
         QlineNo = self.request.get("ln")
+        QcolNo = self.request.get("cn")
         QerrMsg = self.request.get("err")
         QinfoMsg = self.request.get("info")
         QUA = os.environ['HTTP_USER_AGENT']
@@ -62,7 +64,7 @@ class MainHandler(webapp.RequestHandler):
             QserverPath += "#" + o.fragment
         Qguid = self.request.get("ui")
         Qi = self.request.get("i")
-        storeLog = LogErr(serverName=QserverName, serverPath=QserverPath, fileLoc=QfileLoc, lineNo=QlineNo, errMsg=QerrMsg, infoMsg=QinfoMsg, IP=QIP, UA=QUA, OSName=QOSName, OSVer=QOSVer, BrowserName=QBrowserName, BrowserVer=QBrowserVer, guid=Qguid)
+        storeLog = LogErr(serverName=QserverName, serverPath=QserverPath, fileLoc=QfileLoc, lineNo=QlineNo, colNo=QcolNo, errMsg=QerrMsg, infoMsg=QinfoMsg, IP=QIP, UA=QUA, OSName=QOSName, OSVer=QOSVer, BrowserName=QBrowserName, BrowserVer=QBrowserVer, guid=Qguid)
         try:
             storeLog.put()
             errMsg = ""
