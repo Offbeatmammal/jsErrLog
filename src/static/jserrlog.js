@@ -36,6 +36,8 @@ if (!window.jsErrLog) {
     // set to false to log errors but pass them through to the default handler
     // (and see them in the browser's error console)
     jsErrLog.trapErrors = true;
+    // log errrors to browser console
+    jsErrLog.logToConsole = false;
 
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
@@ -129,15 +131,18 @@ function parseURL(url)
 }
 
 // Respond to an error being raised in the javascript
-jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
-	// Is we are debugging on the page then display the error details
-	if(jsErrLog.debugMode) {
-		jsErrLog.error_msg = "Error found in page: " + file_loc +
+jsErrLog.ErrorTrap = function (msg, file_loc, line_no, col_no) {
+    jsErrLog.error_msg = "Error found in page: " + file_loc +
 		                     "\nat line number:" + line_no +
 		                     "\nError Message:" + msg;
-		if (jsErrLog.info != "") {
-			jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
-		}
+    if (jsErrLog.info != "") {
+        jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
+    }
+    if (jsErrLog.logToConsole) {
+        console.log(jsErrLog.error_msg);
+    }
+	// Is we are debugging on the page then display the error details
+	if(jsErrLog.debugMode) {
 		alert("jsErrLog caught an error\n--------------\n" + jsErrLog.error_msg);
 	} else {
 		jsErrLog.err_i = jsErrLog.err_i + 1;
