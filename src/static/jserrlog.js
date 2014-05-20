@@ -142,9 +142,10 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		// if there are parameters we need to ignore on the querystring strip them off
 		var sn = document.URL;
 		if (jsErrLog.qsIgnore.length > 0) {
-			var objURL = new Object();
- 			// make sure the qsIgnore array is lower case
-			for (var i in jsErrLog.qsIgnore) {
+		    var objURL = new Object();
+		    // make sure the qsIgnore array is lower case
+		    var len = jsErrLog.qsIgnore.length;
+			for (var i=0; i<len; i++) {
 				jsErrLog.qsIgnore[i] = jsErrLog.qsIgnore[i].toLowerCase();
 			}
  
@@ -163,8 +164,8 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 				}
 			);
 			var newSearch = "";
-			for (var strKey in objURL){
-				newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
+			for (var strKey in objURL) {
+			    newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
 			};
 
 			// Rebuild the new "sn" parameter containing the sanitized version of the querystring
@@ -188,8 +189,8 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 				}
 			);
 			var newFL = "";
-			for (var strKey in objURL){
-				newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
+			for (var strKey in objURL) {
+			    newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
 			};
 			if (newFL != "") {
 				file_loc = fl.protocol + fl.host + fl.pathname;
@@ -206,16 +207,17 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		src += "&ln=" + line_no;
 		src += "&cn="; 
 		src += (typeof col_no === "undefined") ? "" : col_no;
-		src += "&err=" + escape(msg.substr(0, 1024));
 		src += "&ui=" + jsErrLog.guid();
 		if (jsErrLog.info != "") {
 			src += "&info=" + escape(jsErrLog.info.substr(0, 512));
-		}
-		
+        }
+        src += "&err=" + escape(msg.substr(0, 1792-src.length));
+
 		// check that the fl domain/prefix doesn't match anything in the domainIgnore array
-		ignore = false
-		ignoreFL = file_loc.toLowerCase()
-		for (var i in jsErrLog.domainIgnore) {
+	    var ignore = false;
+	    var ignoreFL = file_loc.toLowerCase();
+	    len = jsErrLog.domainIgnore.length;
+		for (var i=0; i<len; i++) {
 			if (ignoreFL.substr(0,jsErrLog.domainIgnore[i].length) == jsErrLog.domainIgnore[i].toLowerCase()) {
 				ignore = true;
 				break;
@@ -224,14 +226,14 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		
 		if (ignore) {
 			// the file_loc matched an item we want to ignore
-			console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list")
+		    console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list");
 		} else {
 
 			// and pass the error details to the Async logging sender		
 			// if the jsErrLog.maxRep hasn't tripped
 			if ((jsErrLog.maxRep > 0) || (jsErrLog.maxRep = -1)) {
 				if (jsErrLog.maxRep > 0) {
-					jsErrLog.maxRep -= 1
+				    jsErrLog.maxRep -= 1;
 				}
 				jsErrLog.appendScript(jsErrLog.err_i, src);
 			}
