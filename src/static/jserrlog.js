@@ -32,7 +32,10 @@ if (!window.jsErrLog) {
 	// default ignored domains to nothing
     jsErrLog.domainIgnore = new Array();
 	// max number of reports sent from a page (defaults to 10, -1 allows infinite)
-	jsErrLog.maxRep = 10;
+    jsErrLog.maxRep = 10;
+    // set to false to log errors but pass them through to the default handler
+    // (and see them in the browser's error console)
+    jsErrLog.trapErrors = true;
 
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
@@ -47,7 +50,7 @@ if (!window.jsErrLog) {
 			// process any existing onerror handler 
 			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
 		}
-		return true;
+        return jsErrLog.trapErrors;
 	}
 }
 
