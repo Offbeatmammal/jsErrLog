@@ -52,7 +52,7 @@ if (!window.jsErrLog) {
 			// process any existing onerror handler 
 			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
 		}
-        return jsErrLog.trapErrors;
+        return !jsErrLog.trapErrors;
 	}
 }
 
@@ -95,17 +95,24 @@ jsErrLog.guid = function() { // http://www.ietf.org/rfc/rfc4122.txt section 4.4
 }
 
 // Needed to break the URL up if we want to ignore parameters
-function parseURL(url)
-{
+function parseURL(url) {
+
     // save the unmodified url to "href" property so
     // the returned object matches the built-in location object
     var locn = { 'href' : url };
+
+    if (typeof url == "undefined" || url == "") {
+        return locn;
+    }
 
     // split the URL components
     var urlParts = url.replace('//', '/').split('/');
 
     //store the protocol and host
     locn.protocol = urlParts[0];
+    if (urlParts.length <=1 ) {
+        return locn;
+    }
     locn.host = urlParts[1];
 
     //extract port number from the host
@@ -173,40 +180,42 @@ jsErrLog.ErrorTrap = function (msg, file_loc, line_no, col_no) {
 			);
 			var newSearch = "";
 			for (var strKey in objURL) {
-			    newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
+				newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
 			};
 
 			// Rebuild the new "sn" parameter containing the sanitized version of the querystring
 			sn = window.location.protocol + window.location.host + window.location.pathname;
 			sn += window.location.search != ("") ? newSearch : "";
 			sn += window.location.hash != ("") ? window.location.hash : "";
-			
-			// now repeat the process for the fileloc
-			var fl = parseURL(file_loc);
-			objURL = new Object();
-			fl.search.replace(
-			new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
-			// For each matched query string pair, add that
-			// pair to the URL struct using the pre-equals
-			// value as the key.
-				function( $0, $1, $2, $3 ){
-					// Only if the key is NOT in the ignore list should we pick it up
-					if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
-						objURL[ $1 ] = $3;
+
+			// now repeat the process for the fileloc, if it exists 
+			// (in some cases, like an explicitly thrown exception, fileloc might be empty)
+			if (typeof file_loc != "undefined" && file_loc.length > 1) {
+				var fl = parseURL(file_loc);
+				objURL = new Object();
+				fl.search.replace(
+					new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+					// For each matched query string pair, add that
+					// pair to the URL struct using the pre-equals
+					// value as the key.
+					function($0, $1, $2, $3) {
+						// Only if the key is NOT in the ignore list should we pick it up
+						if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
+							objURL[$1] = $3;
+						}
 					}
+				);
+				var newFL = "";
+				for (var strKey in objURL) {
+					newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
+				};
+				if (newFL != "") {
+					file_loc = fl.protocol + fl.host + fl.pathname;
+					file_loc += fl.search != ("") ? newFL : "";
+					file_loc += fl.hash != ("") ? fl.hash : "";
 				}
-			);
-			var newFL = "";
-			for (var strKey in objURL) {
-			    newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
-			};
-			if (newFL != "") {
-				file_loc = fl.protocol + fl.host + fl.pathname;
-				file_loc += fl.search != ("") ? newFL : "";
-				file_loc += fl.hash != ("") ? fl.hash : "";
- 
 			}
-		}
+	    }
 		
 		// format the data for the request
 		var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
