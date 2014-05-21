@@ -30,14 +30,14 @@ if (!window.jsErrLog) {
 	// default the qsIgnore to nothing (ie pass everything on the querystring)
 	jsErrLog.qsIgnore = new Array();
 	// default ignored domains to nothing
-    jsErrLog.domainIgnore = new Array();
+	jsErrLog.domainIgnore = new Array();
 	// max number of reports sent from a page (defaults to 10, -1 allows infinite)
-    jsErrLog.maxRep = 10;
-    // set to false to log errors but pass them through to the default handler
-    // (and see them in the browser's error console)
-    jsErrLog.trapErrors = true;
-    // log errrors to browser console
-    jsErrLog.logToConsole = false;
+	jsErrLog.maxRep = 10;
+	// set to false to log errors but pass them through to the default handler
+	// (and see them in the browser's error console)
+	jsErrLog.trapErrors = true;
+	// log errrors to browser console
+	jsErrLog.logToConsole = false;
 
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
@@ -210,12 +210,15 @@ jsErrLog.ErrorTrap = function (msg, file_loc, line_no, col_no) {
 					newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
 				};
 				if (newFL != "") {
+					if (newFL.length > 2000) {
+						newFL = newFL.substring(0, 2000);
+					}
 					file_loc = fl.protocol + fl.host + fl.pathname;
 					file_loc += fl.search != ("") ? newFL : "";
 					file_loc += fl.hash != ("") ? fl.hash : "";
 				}
 			}
-	    }
+		}
 		
 		// format the data for the request
 		var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
