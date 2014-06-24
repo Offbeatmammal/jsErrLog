@@ -38,6 +38,10 @@ if (!window.jsErrLog) {
 	jsErrLog.trapErrors = true;
 	// log errrors to browser console
 	jsErrLog.logToConsole = false;
+	// Skip CrossOrigin errors. These supply no helpful debugging info, and because
+	// of JavaScript injection from a (possibly ill-behaved) browser plugin, these can't
+	// be controlled from the app side.
+	jsErrLog.ignoreCrossOriginErrors = false;
 
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
@@ -247,7 +251,10 @@ jsErrLog.ErrorTrap = function (msg, file_loc, line_no, col_no) {
 		if (ignore) {
 			// the file_loc matched an item we want to ignore
 		    console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list");
-		} else {
+		} else if (jsErrLog.ignoreCrossOriginErrors && msg == "Script Error" && line_no == "0") {
+		    console.log("jsErrLog - cross origin script error ignored because no additional error info supplied.");
+		} 
+	        else {
 
 			// and pass the error details to the Async logging sender		
 			// if the jsErrLog.maxRep hasn't tripped
