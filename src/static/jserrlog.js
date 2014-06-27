@@ -129,7 +129,7 @@
 	// default the qsIgnore to nothing (ie pass everything on the querystring)
 	jsErrLog.qsIgnore = new Array();
 	// default ignored domains to nothing
-	jsErrLog.domainBlacklist = new Array();
+	jsErrLog.domainIgnore = new Array();
 	// whitelist script domains which can trigger errors
 	jsErrLog.domainWhitelist = new Array();
 	// max number of reports sent from a page (defaults to 10, false allows infinite)
@@ -212,8 +212,8 @@
 			}
 		}
 		
-		if (jsErrLog.domainBlacklist.length > 0) {	
-			if (jsErrUtils.matchDomains(file_loc,jsErrLog.domainBlacklist) === true){
+		if (jsErrLog.domainIgnore.length > 0) {	
+			if (jsErrUtils.matchDomains(file_loc,jsErrLog.domainIgnore) === true){
 				console.log("jsErrLog - report ignored because " + file_loc + " matched the blacklist" );
 				return;
 			}
