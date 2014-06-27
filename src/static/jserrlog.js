@@ -1,11 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  jsErrLog.js         version 1.4.2
+//  jsErrLog.js         version 1.5.0
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
-//
-//  v1.4.2: domainBlacklist adds prefix ignore on file location
+//  
+//  v1.5.0: QueryString support <IE9, White- & Blacklist, unique guid/page
+//  v1.4.2: domainIgnore adds prefix ignore on file location
 //  v1.4.1: added support for colNo in browsers that support it (IE10, Chrome30)
 //  v1.4.0: limit initialization to one instance, escape FL and ERR parameter, limit reports sent
 //  v1.3.0: add support for jsErrLog.qsignore parameter
