@@ -169,7 +169,7 @@ This project can be forked from
 requests from feature branches.
 
 License
-———
+-------
 Copyright © 2014
 This work is free. It comes without any warranty, to the extent permitted by applicable law. You can redistribute it and/or modify it under the
 terms of the Do What The Fuck You Want To Public License, Version 2,
