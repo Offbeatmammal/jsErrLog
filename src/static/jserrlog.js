@@ -30,9 +30,18 @@ if (!window.jsErrLog) {
 	// default the qsIgnore to nothing (ie pass everything on the querystring)
 	jsErrLog.qsIgnore = new Array();
 	// default ignored domains to nothing
-    jsErrLog.domainIgnore = new Array();
+	jsErrLog.domainIgnore = new Array();
 	// max number of reports sent from a page (defaults to 10, -1 allows infinite)
 	jsErrLog.maxRep = 10;
+	// set to false to log errors but pass them through to the default handler
+	// (and see them in the browser's error console)
+	jsErrLog.trapErrors = true;
+	// log errrors to browser console
+	jsErrLog.logToConsole = false;
+	// Skip CrossOrigin errors. These supply no helpful debugging info, and because
+	// of JavaScript injection from a (possibly ill-behaved) browser plugin, these can't
+	// be controlled from the app side.
+	jsErrLog.ignoreCrossOriginErrors = false;
 
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
@@ -47,7 +56,7 @@ if (!window.jsErrLog) {
 			// process any existing onerror handler 
 			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
 		}
-		return true;
+        return !jsErrLog.trapErrors;
 	}
 }
 
@@ -90,17 +99,24 @@ jsErrLog.guid = function() { // http://www.ietf.org/rfc/rfc4122.txt section 4.4
 }
 
 // Needed to break the URL up if we want to ignore parameters
-function parseURL(url)
-{
+function parseURL(url) {
+
     // save the unmodified url to "href" property so
     // the returned object matches the built-in location object
     var locn = { 'href' : url };
+
+    if (typeof url == "undefined" || url == "") {
+        return locn;
+    }
 
     // split the URL components
     var urlParts = url.replace('//', '/').split('/');
 
     //store the protocol and host
     locn.protocol = urlParts[0];
+    if (urlParts.length <=1 ) {
+        return locn;
+    }
     locn.host = urlParts[1];
 
     //extract port number from the host
@@ -126,15 +142,18 @@ function parseURL(url)
 }
 
 // Respond to an error being raised in the javascript
-jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
-	// Is we are debugging on the page then display the error details
-	if(jsErrLog.debugMode) {
-		jsErrLog.error_msg = "Error found in page: " + file_loc +
+jsErrLog.ErrorTrap = function (msg, file_loc, line_no, col_no) {
+    jsErrLog.error_msg = "Error found in page: " + file_loc +
 		                     "\nat line number:" + line_no +
 		                     "\nError Message:" + msg;
-		if (jsErrLog.info != "") {
-			jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
-		}
+    if (jsErrLog.info != "") {
+        jsErrLog.error_msg += "\nInformation:" + jsErrLog.info;
+    }
+    if (jsErrLog.logToConsole) {
+        console.log(jsErrLog.error_msg);
+    }
+	// Is we are debugging on the page then display the error details
+	if(jsErrLog.debugMode) {
 		alert("jsErrLog caught an error\n--------------\n" + jsErrLog.error_msg);
 	} else {
 		jsErrLog.err_i = jsErrLog.err_i + 1;
@@ -142,9 +161,10 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		// if there are parameters we need to ignore on the querystring strip them off
 		var sn = document.URL;
 		if (jsErrLog.qsIgnore.length > 0) {
-			var objURL = new Object();
- 			// make sure the qsIgnore array is lower case
-			for (var i in jsErrLog.qsIgnore) {
+		    var objURL = new Object();
+		    // make sure the qsIgnore array is lower case
+		    var len = jsErrLog.qsIgnore.length;
+			for (var i=0; i<len; i++) {
 				jsErrLog.qsIgnore[i] = jsErrLog.qsIgnore[i].toLowerCase();
 			}
  
@@ -163,39 +183,44 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 				}
 			);
 			var newSearch = "";
-			for (var strKey in objURL){
-				newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
+			for (var strKey in objURL) {
+				newSearch += newSearch == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
 			};
 
 			// Rebuild the new "sn" parameter containing the sanitized version of the querystring
 			sn = window.location.protocol + window.location.host + window.location.pathname;
 			sn += window.location.search != ("") ? newSearch : "";
 			sn += window.location.hash != ("") ? window.location.hash : "";
-			
-			// now repeat the process for the fileloc
-			var fl = parseURL(file_loc);
-			objURL = new Object();
-			fl.search.replace(
-			new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
-			// For each matched query string pair, add that
-			// pair to the URL struct using the pre-equals
-			// value as the key.
-				function( $0, $1, $2, $3 ){
-					// Only if the key is NOT in the ignore list should we pick it up
-					if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
-						objURL[ $1 ] = $3;
+
+			// now repeat the process for the fileloc, if it exists 
+			// (in some cases, like an explicitly thrown exception, fileloc might be empty)
+			if (typeof file_loc != "undefined" && file_loc.length > 1) {
+				var fl = parseURL(file_loc);
+				objURL = new Object();
+				fl.search.replace(
+					new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+					// For each matched query string pair, add that
+					// pair to the URL struct using the pre-equals
+					// value as the key.
+					function($0, $1, $2, $3) {
+						// Only if the key is NOT in the ignore list should we pick it up
+						if (jsErrLog.qsIgnore.indexOf($1.toLowerCase()) == -1) {
+							objURL[$1] = $3;
+						}
 					}
+				);
+				var newFL = "";
+				for (var strKey in objURL) {
+					newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey];
+				};
+				if (newFL != "") {
+					if (newFL.length > 2000) {
+						newFL = newFL.substring(0, 2000);
+					}
+					file_loc = fl.protocol + fl.host + fl.pathname;
+					file_loc += fl.search != ("") ? newFL : "";
+					file_loc += fl.hash != ("") ? fl.hash : "";
 				}
-			);
-			var newFL = "";
-			for (var strKey in objURL){
-				newFL += newFL == ("") ? "?" + strKey + "=" + objURL[strKey] : "&" + strKey + "=" + objURL[strKey]
-			};
-			if (newFL != "") {
-				file_loc = fl.protocol + fl.host + fl.pathname;
-				file_loc += fl.search != ("") ? newFL : "";
-				file_loc += fl.hash != ("") ? fl.hash : "";
- 
 			}
 		}
 		
@@ -206,16 +231,17 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		src += "&ln=" + line_no;
 		src += "&cn="; 
 		src += (typeof col_no === "undefined") ? "" : col_no;
-		src += "&err=" + escape(msg.substr(0, 1024));
 		src += "&ui=" + jsErrLog.guid();
 		if (jsErrLog.info != "") {
 			src += "&info=" + escape(jsErrLog.info.substr(0, 512));
-		}
-		
+        }
+        src += "&err=" + escape(msg.substr(0, 1792-src.length));
+
 		// check that the fl domain/prefix doesn't match anything in the domainIgnore array
-		ignore = false
-		ignoreFL = file_loc.toLowerCase()
-		for (var i in jsErrLog.domainIgnore) {
+	    var ignore = false;
+	    var ignoreFL = file_loc.toLowerCase();
+	    len = jsErrLog.domainIgnore.length;
+		for (var i=0; i<len; i++) {
 			if (ignoreFL.substr(0,jsErrLog.domainIgnore[i].length) == jsErrLog.domainIgnore[i].toLowerCase()) {
 				ignore = true;
 				break;
@@ -224,14 +250,17 @@ jsErrLog.ErrorTrap = function(msg, file_loc, line_no, col_no) {
 		
 		if (ignore) {
 			// the file_loc matched an item we want to ignore
-			console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list")
-		} else {
+		    console.log("jsErrLog - report ignored because " + file_loc + " matched domainIgnore list");
+		} else if (jsErrLog.ignoreCrossOriginErrors && msg == "Script Error" && line_no == "0") {
+		    console.log("jsErrLog - cross origin script error ignored because no additional error info supplied.");
+		} 
+	        else {
 
 			// and pass the error details to the Async logging sender		
 			// if the jsErrLog.maxRep hasn't tripped
 			if ((jsErrLog.maxRep > 0) || (jsErrLog.maxRep = -1)) {
 				if (jsErrLog.maxRep > 0) {
-					jsErrLog.maxRep -= 1
+				    jsErrLog.maxRep -= 1;
 				}
 				jsErrLog.appendScript(jsErrLog.err_i, src);
 			}
