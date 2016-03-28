@@ -125,7 +125,7 @@
 	// default the additional info message to blank
 	jsErrLog.info = "";
 	// default the URL to the appspot service
-	jsErrLog.url = "http://jserrlog.appspot.com/logger.js";
+	jsErrLog.url = "https://jserrlog.appspot.com/logger.js";
 	// default the qsIgnore to nothing (ie pass everything on the querystring)
 	jsErrLog.qsIgnore = new Array();
 	// default ignored domains to nothing
