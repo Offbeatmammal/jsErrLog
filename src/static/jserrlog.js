@@ -4,7 +4,7 @@
 //
 //  Trap javascript errors on a webpage and re-direct them to a remote logging service
 //  which can then be used to identify and resolve issues without impacting user experience
-//  
+//
 //  v1.5.0: QueryString support <IE9, White- & Blacklist, unique guid/page
 //  v1.4.2: domainIgnore adds prefix ignore on file location
 //  v1.4.1: added support for colNo in browsers that support it (IE10, Chrome30)
@@ -27,9 +27,9 @@
             	if( this[i] == element ) return i;
             }
             return -1;
-		};        
+		};
 	}
-	
+
 	window.jsErrLog = {}; //Global
 	var jsErrUtils	= {}; //Local
 
@@ -37,57 +37,57 @@
 
 	// Generate guid
 	jsErrUtils.generateGuid = function() {
-		return 'aaaaaaaa-aaaa-4aaa-baaa-aaaaaaaaaaaa'.replace(/[ab]/g, function(ch) { 
-			var digit = Math.random()*16|0, newch = ch == 'a' ? digit : (digit&0x3|0x8); 
-			return newch.toString(16); 
+		return 'aaaaaaaa-aaaa-4aaa-baaa-aaaaaaaaaaaa'.replace(/[ab]/g, function(ch) {
+			var digit = Math.random()*16|0, newch = ch == 'a' ? digit : (digit&0x3|0x8);
+			return newch.toString(16);
 		}).toUpperCase();
 	};
-	
+
 	// Needed to break the URL up if we want to ignore parameters
 	jsErrUtils.parseURL = function(url) {
-	
+
 	    // save the unmodified url to "href" property so
 	    // the returned object matches the built-in location object
 	    var locn = { 'href' : url };
-	
+
 	    // split the URL components
 	    var urlParts = url.replace('//', '/').split('/');
-	
+
 	    //store the protocol and host
 	    locn.protocol = urlParts[0];
-	    
+
 	    if (urlParts.length > 1 ) {
-	    
+
 		    locn.host = urlParts[1];
-		
+
 		    //extract port number from the host
 		    urlParts[1] = urlParts[1].split(':');
 		    locn.hostname = urlParts[1][0];
 		    locn.port = urlParts[1].length > 1 ? urlParts[1][1] : '';
-		
+
 		    //splice and join the remainder to get the pathname
 		    urlParts.splice(0, 2);
 		    locn.pathname = '/' + urlParts.join('/');
-		
+
 		    //extract hash
 		    locn.pathname = locn.pathname.split('#');
 		    locn.hash = locn.pathname.length > 1 ? '#' + locn.pathname[1] : '';
 		    locn.pathname = locn.pathname[0];
-		
+
 		    // extract search query
 		    locn.pathname = locn.pathname.split('?');
 		    locn.search = locn.pathname.length > 1 ? '?' + locn.pathname[1] : '';
 		    locn.pathname = locn.pathname[0];
-	
+
 	    }
-	    
+
 	    return locn;
 	}
-	
+
 	jsErrUtils.matchDomains = function( loc, domains ) {
-		return (new RegExp( "(" + domains.join('|').replace(/\./g,'\\.').replace(/\*/g,'\\w+') + ")" )).test( loc );		
+		return (new RegExp( "(" + domains.join('|').replace(/\./g,'\\.').replace(/\*/g,'\\w+') + ")" )).test( loc );
 	}
-	
+
 	jsErrUtils.stripQueries = function( loc ) {
 		var queries = {};
 		// Use the String::replace method to iterate over each
@@ -104,7 +104,7 @@
 				}
 			}
 		);
-		
+
 		var search = "";
 		for (var key in queries) {
 			search += ( search.length === 0 ? "?" : "&" ) + key + "=" + queries[key];
@@ -115,9 +115,9 @@
 			+	( loc.search != ("") ? search : "" )
 			+	( loc.hash != ("") ? loc.hash : "" );
 	}
-	
+
 	//jsErrLog definitions
-	
+
 	// default to debugging off
 	jsErrLog.debugMode = false;
 	// default the index for the message to 0 in case there is more than one
@@ -148,21 +148,57 @@
 	jsErrLog.uniqueGuid = true;
 	// Generate guid for page session
 	jsErrLog.guid = jsErrUtils.generateGuid();
-	
+
 	// used internally for testing to know if test succeeded or not
 	jsErrLog._had_errors = false;
 
 	// add the hook to the onError event
 	// - first store any existing error handler for the page
-	jsErrLog.fnPreviousOnErrorHandler = window.onerror; 
+	jsErrLog.fnPreviousOnErrorHandler = window.onerror;
 	// - attach our error handler
 	window.onerror = function(msg, file_loc, line_no, col_no){
 		jsErrLog.errorTrap(msg, file_loc, line_no, col_no);
 		if(typeof(jsErrLog.fnPreviousOnErrorHandler) == "function") {
-			// process any existing onerror handler 
+			// process any existing onerror handler
 			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
 		}
         return jsErrLog.trapErrors;
+	}
+
+	// Send error to server side, default approach is jsErrLog.appendScript.
+	jsErrLog.sendError = function(i, sn, file_loc, line_no, col_no, ui, info, msg) {
+		try {
+			jsErrLog.sendErrorInternal(i, sn, file_loc, line_no, col_no, ui, info, msg)
+		} catch (e) {
+			jsErrLog.errorHandler("sendErrorInternal", e);
+		}
+	}
+
+	// Invoke jsErrLog.appendScript method to send error. Overwrite this method to use custom send error method.
+	jsErrLog.sendErrorInternal = function(i, sn, file_loc, line_no, col_no, ui, info, msg) {
+		// format the data for the request
+		var src = jsErrLog.url + "?i=" + i;
+		src += "&sn=" + escape(sn);
+		src += "&fl=" + escape(file_loc);
+		src += "&ln=" + line_no;
+		src += "&cn=";
+		src += (typeof col_no === "undefined") ? "" : col_no;
+		src += "&ui=" + ui
+		if (info != "") {
+			src += "&info=" + escape(info.substr(0, 256));//You should be able to give enough information with 256 chars
+				}
+				src += "&err=";
+				// Keep the path length under 2000 chars which is advised for URL's in browsers
+				src += escape(msg.substr(0, 1999-src.length));
+
+		// and pass the error details to the Async logging sender
+		// if the jsErrLog.maxRep hasn't tripped
+		if (jsErrLog.maxRep > 0 || jsErrLog.maxRep === false) {
+			if (jsErrLog.maxRep > 0) {
+					jsErrLog.maxRep -= 1;
+			}
+			jsErrLog.appendScript(i, src);
+		}
 	}
 
 	//Append the script to head, calling your error logger
@@ -170,17 +206,17 @@
 		try {
 			var script 	= document.createElement("script"),
 				head 	= document.getElementsByTagName("head")[0];
-				
+
 			script.id = "script" + index;
 			script.src = src;
 			script.type = "text/javascript";
-			
+
 			head.appendChild(script);
 		} catch (e) {
 			jsErrLog.errorHandler("appendScript", e);
 		}
 	};
-	
+
 	//Hide the log call, this won't remove the Javascript completely but it'll remove it from the HTML
 	jsErrLog.removeScript = function(index) {
 		try {
@@ -191,100 +227,83 @@
 			jsErrLog.errorHandler("removeScript", e);
 		}
 	};
-	
+
 	//Error handler to catch the removeScript & appendScript errors
 	jsErrLog.errorHandler = function(source, error) {
 		jsErrLog._had_errors = true;
-		
+
 		var message = "jsErrLog encountered an unexpected error.\n\nSource: " + source + "\nDescription: " + error.description;
 		if (jsErrLog.debugMode) alert( message );
 		else					console.log( message );
 	};
-	
+
 	// Respond to an error being raised in the javascript
 	jsErrLog.errorTrap = function (msg, file_loc, line_no, col_no) {
-	    
+
 		//When a whitelist exists only trigger errors from script coming from those domains
-		if (jsErrLog.domainWhitelist.length > 0) {	
+		if (jsErrLog.domainWhitelist.length > 0) {
 			if (jsErrUtils.matchDomains(file_loc,jsErrLog.domainWhitelist) === false){
 				console.log("jsErrLog - report ignored because " + file_loc + " did not match the whitelist" );
 				return;
 			}
 		}
-		
-		if (jsErrLog.domainIgnore.length > 0) {	
+
+		if (jsErrLog.domainIgnore.length > 0) {
 			if (jsErrUtils.matchDomains(file_loc,jsErrLog.domainIgnore) === true){
 				console.log("jsErrLog - report ignored because " + file_loc + " matched the blacklist" );
 				return;
 			}
 		}
-		
+
 		if (jsErrLog.ignoreCrossOriginErrors && msg == "Script Error" && line_no == "0") {
 		    console.log("jsErrLog - cross origin script error ignored because no additional error info supplied.");
 		    return;
 		}
-		
+
 		var error_msg =	"Error found in page: " + file_loc +
 	                    "\nat line number:" + line_no +
 	                    "\nError Message:" + msg;
-		
+
 	    if (jsErrLog.info != "") {
 	        error_msg += "\nInformation:" + jsErrLog.info;
 	    }
-	    
+
 	    if (jsErrLog.logToConsole) {
 	        console.log(error_msg);
 	    }
-	    
+
 		// Is we are debugging on the page then display the error details
 		if (jsErrLog.debugMode) {
 			alert("jsErrLog caught an error\n--------------\n" + error_msg);
 		} else {
 			jsErrLog.err_i += 1;
-	
+
 			// if there are parameters we need to ignore on the querystring strip them off
 			var sn = document.URL;
 			if (jsErrLog.qsIgnore.length > 0) {
-			    
+
 			    // make sure the qsIgnore array is lower case
 				for (var i=0,ilen=jsErrLog.qsIgnore.length; i<ilen; i++) {
 					jsErrLog.qsIgnore[i] = jsErrLog.qsIgnore[i].toLowerCase();
 				}
-	 
+
 				sn = jsErrUtils.stripQueries( window.location );
-	
-				// now repeat the process for the fileloc, if it exists 
+
+				// now repeat the process for the fileloc, if it exists
 				// (in some cases, like an explicitly thrown exception, fileloc might be empty)
 				if (typeof file_loc !== "undefined" && file_loc.length > 1) {
-					
+
 					file_loc = jsErrUtils.stripQueries( jsErrUtils.parseURL(file_loc) );
-					
+
 				}
 			}
-			
-			// format the data for the request
-			var src = jsErrLog.url + "?i=" + jsErrLog.err_i;
-			src += "&sn=" + escape(sn);
-			src += "&fl=" + escape(file_loc);
-			src += "&ln=" + line_no;
-			src += "&cn="; 
-			src += (typeof col_no === "undefined") ? "" : col_no;
-			src += "&ui=" + ( jsErrLog.uniqueGuid ? jsErrUtils.generateGuid() : jsErrLog.guid );
-			if (jsErrLog.info != "") {
-				src += "&info=" + escape(jsErrLog.info.substr(0, 256));//You should be able to give enough information with 256 chars
-	        }
-	        src += "&err=";
-	        // Keep the path length under 2000 chars which is advised for URL's in browsers 
-	        src += escape(msg.substr(0, 1999-src.length)); 
-	        
-			// and pass the error details to the Async logging sender		
-			// if the jsErrLog.maxRep hasn't tripped
-			if (jsErrLog.maxRep > 0 || jsErrLog.maxRep === false) {
-				if (jsErrLog.maxRep > 0) {
-				    jsErrLog.maxRep -= 1;
-				}
-				jsErrLog.appendScript(jsErrLog.err_i, src);
-			}
+
+			// send error information to server.
+			var i = jsErrLog.err_i;
+			var ui = jsErrLog.uniqueGuid ? jsErrUtils.generateGuid() : jsErrLog.guid;
+			var info = jsErrLog.info;
+			jsErrLog.sendError(i, sn, file_loc, line_no, col_no, ui, info, msg);
+
 		}
 		return true;
 	}
