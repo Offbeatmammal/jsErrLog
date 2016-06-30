@@ -156,26 +156,26 @@
 	// - first store any existing error handler for the page
 	jsErrLog.fnPreviousOnErrorHandler = window.onerror;
 	// - attach our error handler
-	window.onerror = function(msg, file_loc, line_no, col_no){
-		jsErrLog.errorTrap(msg, file_loc, line_no, col_no);
+	window.onerror = function(msg, file_loc, line_no, col_no, error){
+		jsErrLog.errorTrap(msg, file_loc, line_no, col_no, error);
 		if(typeof(jsErrLog.fnPreviousOnErrorHandler) == "function") {
 			// process any existing onerror handler
-			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no);
+			jsErrLog.fnPreviousOnErrorHandler(msg, file_loc, line_no, col_no, error);
 		}
         return jsErrLog.trapErrors;
 	}
 
 	// Send error to server side, default approach is jsErrLog.appendScript.
-	jsErrLog.sendError = function(i, sn, file_loc, line_no, col_no, ui, info, msg) {
+	jsErrLog.sendError = function(i, sn, file_loc, line_no, col_no, ui, info, msg, error) {
 		try {
-			jsErrLog.sendErrorInternal(i, sn, file_loc, line_no, col_no, ui, info, msg)
+			jsErrLog.sendErrorInternal(i, sn, file_loc, line_no, col_no, ui, info, msg, error)
 		} catch (e) {
 			jsErrLog.errorHandler("sendErrorInternal", e);
 		}
 	}
 
 	// Invoke jsErrLog.appendScript method to send error. Overwrite this method to use custom send error method.
-	jsErrLog.sendErrorInternal = function(i, sn, file_loc, line_no, col_no, ui, info, msg) {
+	jsErrLog.sendErrorInternal = function(i, sn, file_loc, line_no, col_no, ui, info, msg, error) {
 		// format the data for the request
 		var src = jsErrLog.url + "?i=" + i;
 		src += "&sn=" + escape(sn);
@@ -238,7 +238,7 @@
 	};
 
 	// Respond to an error being raised in the javascript
-	jsErrLog.errorTrap = function (msg, file_loc, line_no, col_no) {
+	jsErrLog.errorTrap = function (msg, file_loc, line_no, col_no, error) {
 
 		//When a whitelist exists only trigger errors from script coming from those domains
 		if (jsErrLog.domainWhitelist.length > 0) {
@@ -302,7 +302,7 @@
 			var i = jsErrLog.err_i;
 			var ui = jsErrLog.uniqueGuid ? jsErrUtils.generateGuid() : jsErrLog.guid;
 			var info = jsErrLog.info;
-			jsErrLog.sendError(i, sn, file_loc, line_no, col_no, ui, info, msg);
+			jsErrLog.sendError(i, sn, file_loc, line_no, col_no, ui, info, msg, error);
 
 		}
 		return true;
